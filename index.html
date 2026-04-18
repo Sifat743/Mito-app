@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Mito</title>
+
+  <meta name="theme-color" content="#14181d" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <style>
+    :root{--bg:#14181d;--card:#1c2229;--card2:#262d35;--text:#edf1f4;--muted:#aab3bb;--accent:#d9e0e6;--accentText:#1b2229;--border:rgba(255,255,255,.07);--danger:#c65555;--shadow:0 18px 40px rgba(0,0,0,.18);}
+    body.light{--bg:#f3efe8;--card:#fcfaf6;--card2:#eee8de;--text:#21272d;--muted:#72777e;--accent:#36414b;--accentText:#ffffff;--border:rgba(52,61,70,.10);--shadow:0 12px 24px rgba(47,53,59,.07)}
+    
+    .searchScopeInline{border:none;background:var(--card2);color:var(--text);padding:10px 8px;border-radius:12px;outline:none;min-width:116px}
+    .catList{display:grid;gap:8px;margin-top:10px}
+    .catRow{display:flex;gap:8px;align-items:center;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:8px 10px}
+    .catRow input{flex:1;border:none;background:transparent;color:var(--text);outline:none}
+    .reportGrid{display:grid;gap:10px}
+    .reportCard{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:12px}
+    .reportBig{font-size:1.2rem;font-weight:800;margin-top:6px}
+
+    .backupBox{width:100%;min-height:120px;border:1px solid var(--border);background:var(--card2);color:var(--text);border-radius:14px;padding:10px;outline:none;resize:vertical}
+
+
+    .categoryItemsBox{margin-top:10px;display:grid;gap:8px;max-height:220px;overflow:auto}
+    .toolGrid{display:grid;gap:10px}
+    .toolRow{display:grid;gap:8px}
+    .toolRow .quickWrap{display:flex;flex-wrap:wrap}
+    .toolRow select,.toolRow input{min-width:0}
+
+    *{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    button,input,select{font:inherit}
+    .app{max-width:580px;min-height:100%;margin:0 auto;padding:env(safe-area-inset-top) 14px calc(90px + env(safe-area-inset-bottom))}
+    .topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 2px 14px}
+    .brand{font-size:1.35rem;font-weight:800;letter-spacing:-.02em}
+    .sub{color:var(--muted);font-size:.82rem;margin-top:2px}
+    .iconBtn{border:none;background:var(--card);color:var(--text);border-radius:16px;padding:11px 13px;box-shadow:var(--shadow)}
+    .topActions{display:flex;gap:8px;align-items:center}
+    .searchInline{display:flex;align-items:center;gap:8px;overflow:hidden;max-width:0;opacity:0;transition:max-width .22s ease, opacity .18s ease, padding .18s ease;margin-left:0;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+    .searchInline.open{max-width:260px;opacity:1;padding:4px 6px 4px 10px;margin-left:2px}
+    .searchInline input{border:none;background:transparent;color:var(--text);outline:none;width:160px;padding:8px 4px}
+    .searchInline .miniBtn{padding:8px 10px;border-radius:10px}
+
+    .topActions{display:flex;gap:8px;align-items:center}
+    .collapseBox{display:none !important}
+    .collapseBox.open{display:grid !important}
+    .monthNav{display:flex;align-items:center;gap:8px}
+    .monthPill{min-width:86px;text-align:center;border:none;background:var(--card2);color:var(--text);padding:9px 12px;border-radius:12px;font-weight:700}
+    .searchBtn{font-size:1rem}
+    .spentSafe{color:#6ecb7a}
+    .spentOver{color:#e06767}
+    .skullBadge{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:linear-gradient(180deg,#323842,#232a33);border:1px solid rgba(255,255,255,.10);box-shadow:0 2px 6px rgba(0,0,0,.18);font-size:13px;line-height:1;}
+    .netPositive{color:#6ecb7a}
+    .netNegative{color:#e06767}
+    .incomeGood{color:#6ecb7a}
+    .incomeLow{color:#e06767}
+    .itemValueWrap{display:flex;align-items:center;gap:6px}
+    .smallToggle{font-size:.84rem;color:var(--muted)}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+    .statLabel{font-size:.72rem;color:var(--muted);line-height:1.2}
+    .statValue{font-size:1.06rem;font-weight:800;margin-top:8px}
+    .quickCard{padding:16px 16px 12px}
+    .quickTitle{font-weight:800;margin-bottom:4px}
+    .quickSub{font-size:.82rem;color:var(--muted);margin-bottom:10px;line-height:1.35}
+    .quickWrap{display:flex;gap:8px;align-items:center;background:var(--card2);border-radius:18px;padding:8px;border:1px solid var(--border)}
+    .quickInput{flex:1;border:none;background:transparent;color:var(--text);outline:none;padding:10px 8px;font-size:1rem}
+    .enterBtn{border:none;background:var(--accent);color:var(--accentText);padding:11px 15px;border-radius:14px;font-weight:800}
+    .hint{margin-top:8px;font-size:.82rem;color:var(--muted);min-height:20px;line-height:1.35}
+    .panel{margin-top:12px}
+    .panelHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .panelTitle{font-size:.95rem;font-weight:800}
+    .fortRow{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:10px 12px;margin-bottom:10px}
+    .miniNav{display:flex;gap:8px;align-items:center}
+    .miniBtn{border:none;background:var(--card2);color:var(--text);padding:9px 12px;border-radius:12px}
+    .alert{margin-bottom:10px;background:rgba(198,85,85,.14);border:1px solid rgba(198,85,85,.35);color:#ffcdcd;border-radius:16px;padding:11px 12px;font-size:.88rem;line-height:1.35}
+    body.light .alert{background:rgba(179,52,52,.08);color:#822;border-color:rgba(179,52,52,.18)}
+    .list{display:grid;gap:10px}
+    .empty{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;color:var(--muted);text-align:center}
+    .item{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:12px 12px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+    .itemMain{flex:1;min-width:0}
+    .itemTitle{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .itemMeta{font-size:.8rem;color:var(--muted);margin-top:3px}
+    .itemValue{font-weight:800;white-space:nowrap}
+    .rowBtns{display:flex;align-items:center;gap:8px}
+    .rowBtn{border:none;background:var(--card2);color:var(--text);border-radius:10px;padding:8px 10px}
+    .danger{background:rgba(198,85,85,.16);color:#ffd5d5}
+    body.light .danger{background:rgba(179,52,52,.08);color:#822}
+    .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(580px,100%);padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(14px);border-top:1px solid var(--border)}
+    .navGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .tab{border:none;background:var(--card);color:var(--text);padding:13px 10px;border-radius:16px;font-weight:800}
+    .tab.active{background:var(--accent);color:var(--accentText)}
+    .hidden{display:none !important}
+    .sheetBg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:99}
+    .sheetBg.show{display:flex}
+    .sheet{width:100%;max-width:580px;margin:0 auto;background:var(--card);color:var(--text);border-radius:24px 24px 0 0;padding:18px 14px calc(18px + env(safe-area-inset-bottom));border:1px solid var(--border);box-shadow:0 -18px 42px rgba(0,0,0,.35);max-height:88vh;overflow:auto}
+    .sheetHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .sheetTitle{font-size:1rem;font-weight:800}
+    .section{background:var(--card2);border:1px solid var(--border);border-radius:18px;padding:12px;margin:10px 0}
+    .section h4{margin:0 0 10px;font-size:.92rem}
+    .field{display:grid;gap:6px;margin:8px 0}
+    .field label{font-size:.82rem;color:var(--muted)}
+    .input, .select{width:100%;border:none;background:var(--bg);color:var(--text);padding:12px;border-radius:14px;outline:none;border:1px solid var(--border)}
+    .sheetBtns{display:flex;gap:8px;flex-wrap:wrap}
+    .sheetBtn{border:none;background:var(--accent);color:var(--accentText);padding:11px 14px;border-radius:14px;font-weight:800}
+    .sheetBtn.alt{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+    .small{font-size:.8rem;color:var(--muted);line-height:1.35}
+    .inlineRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .togglePill{border:none;background:var(--card2);color:var(--text);padding:8px 12px;border-radius:999px;font-weight:700}
+    .togglePill.active{background:var(--accent);color:var(--accentText)}
+    .catChips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:7px 10px;font-size:.8rem;color:var(--text)}
+
+    .topActions{display:flex;align-items:center;gap:10px}
+    .themeSwitch{position:relative;width:76px;height:42px;border:none;background:var(--card);border-radius:999px;padding:4px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between}
+    .themeSwitch .switchLabel{position:absolute;top:50%;transform:translateY(-50%);font-size:.78rem;font-weight:800;color:var(--muted);pointer-events:none}
+    .themeSwitch .switchLabel.lightLbl{left:12px}
+    .themeSwitch .switchLabel.darkLbl{right:11px}
+    .themeSwitch .switchKnob{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:999px;background:var(--accent);transition:transform .22s ease;display:flex;align-items:center;justify-content:center;color:var(--accentText);font-size:1rem}
+    body.dark .themeSwitch .switchKnob{transform:translateX(34px)}
+    body.dark .themeSwitch .lightLbl{opacity:.45}
+    body:not(.dark) .themeSwitch .darkLbl{opacity:.45}
+    .catBadge{display:inline-block;background:var(--card2);border:1px solid var(--border);border-radius:999px;padding:3px 8px;margin-right:8px;font-size:.74rem;color:var(--text)}
+    .expenseHigh{color:#d14f4f}
+    body.light .expenseHigh{color:#b03e3e}
+
+  </style>
+</head>
+<body class="dark">
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <div class="brand">Mito</div>
+        
+      </div>
+      <div class="topActions">
+        <button class="iconBtn" id="themeToggleBtn" title="Toggle theme">☼</button>
+        <button class="iconBtn" id="searchToggleBtn" title="Search">🔍</button>
+        <button class="iconBtn" id="reportBtn" title="Financial report">📊</button>
+        <div class="searchInline" id="searchInline">
+          <select id="searchScopeInline" class="searchScopeInline">
+            <option value="current_month">This month</option>
+            <option value="shown_month" selected>Shown month</option>
+            <option value="shown_year">Shown year</option>
+            <option value="all">All</option>
+          </select>
+          <input id="searchInputInline" type="text" placeholder="Search entries" />
+          <button class="miniBtn" id="searchCloseBtn" type="button">✕</button>
+        </div>
+        <button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card"><div class="statLabel">This month spent</div><div class="statValue spentSafe" id="spentCard">$0.00</div></div>
+      <div class="card"><div class="statLabel">This month income</div><div class="statValue" id="incomeCard">$0.00</div></div>
+      <div class="card"><div class="statLabel">Net left</div><div class="statValue" id="netCard">$0.00</div></div>
+    </div>
+
+    <div class="card quickCard">
+      <div class="quickTitle">Quick add</div>
+      <div class="quickSub">Expense is default. Type item then amount. Use <b>income</b> for income and <b>work</b> for hours. To force your own category, start with it: <b>charity car 40</b>.</div>
+      <div class="quickWrap">
+        <input id="quickEntry" class="quickInput" placeholder="pizza 40  •  income 100 uber  •  work 7.5 woolworths" />
+        <button class="enterBtn" id="addSmartBtn">Enter</button>
+      </div>
+      <div class="hint" id="smartHint">Expense: <b>pizza 40</b> • Income: <b>income 100 uber</b> • Work: <b>work 7.5 uber</b> • Own category: <b>charity car 40</b></div>
+    </div>
+
+    <div class="panel" id="expensePanel">
+      <div class="panelHeader"><div class="panelTitle">Expenses</div></div>
+      <div class="fortRow">
+        <div class="panelTitle">Category summary</div>
+        <div class="monthNav"><button class="miniBtn" id="prevExpenseMonth">‹</button><button class="monthPill" id="expenseMonthLabel">---</button><button class="miniBtn" id="nextExpenseMonth">›</button><button class="miniBtn" id="toggleExpenseSummary">▾</button></div>
+      </div>
+      <div class="list collapseBox" id="expenseSummaryBox" style="margin-bottom:10px"></div>
+      <div class="fortRow">
+        <div class="panelTitle">Recent items</div>
+        <button class="miniBtn" id="toggleExpenseItems">▾</button>
+      </div>
+      <div class="list collapseBox open" id="expenseItemsBox"><div class="list" id="expenseList"></div></div>
+    </div>
+
+    <div class="panel hidden" id="incomePanel">
+      <div class="panelHeader"><div class="panelTitle">Income</div></div>
+      <div class="fortRow">
+        <div class="panelTitle">Recent income</div>
+        <div class="monthNav"><button class="miniBtn" id="prevIncomeMonth">‹</button><button class="monthPill" id="incomeMonthLabel">---</button><button class="miniBtn" id="nextIncomeMonth">›</button><button class="miniBtn" id="toggleIncomeItems">▾</button></div>
+      </div>
+      <div class="list collapseBox open" id="incomeItemsBox"><div class="list" id="incomeList"></div></div>
+    </div>
+
+    <div class="panel hidden" id="workPanel">
+      <div class="fortRow">
+        <div>
+          <div class="panelTitle" style="margin-bottom:4px">Work fortnight</div>
+          <div class="small" id="fortnightLabel">--</div>
+          <div class="small" id="hoursTotalLabel">0.0 hrs</div>
+        </div>
+        <div class="miniNav">
+          <button class="miniBtn" id="prevFortnight">‹</button>
+          <button class="monthPill" id="thisFortnight">---</button>
+          <button class="miniBtn" id="nextFortnight">›</button>
+        </div>
+      </div>
+      <div class="alert" id="workAlert"></div>
+      <div class="list" id="workList"></div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div class="navGrid">
+      <button class="tab active" data-tab="expense">Expenses</button>
+      <button class="tab" data-tab="income">Income</button>
+      <button class="tab" data-tab="work">Work</button>
+    </div>
+  </div>
+
+
+  <div class="sheetBg" id="searchBg">
+    <div class="sheet">
+      <div class="sheetHead"><div class="sheetTitle">Search</div><button class="iconBtn" id="closeSearch">✕</button></div>
+      <div class="field"><label>Search entries</label><input class="input" id="searchInput" placeholder="Search item, category, place, or date"></div>
+      <div class="small" id="searchHint">Searches expenses, income, and work entries.</div>
+    </div>
+  </div>
+
+  
+  <div class="sheetBg" id="reportBg">
+    <div class="sheet">
+      <div class="sheetHead"><div class="sheetTitle">Financial report summary</div><button class="iconBtn" id="closeReport">✕</button></div>
+      <div class="section">
+        <h4>Range</h4>
+        <div class="field"><label>Mode</label>
+          <select class="input" id="reportMode">
+            <option value="month">Month</option>
+            <option value="year">Year</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <div class="field"><label>Month</label><input class="input" type="month" id="reportMonth"></div>
+        <div class="field"><label>Year</label><select class="input" id="reportYear"></select></div>
+        <div class="field"><label>Category</label><select class="input" id="reportCategory"><option value="__all__">All categories</option></select></div>
+      </div>
+      <div class="section reportGrid">
+        <div class="reportCard"><div class="small">Total spent</div><div class="reportBig" id="reportTotal">$0.00</div></div>
+        <div class="reportCard"><div class="small">Entries</div><div class="reportBig" id="reportCount">0</div></div>
+        <div class="reportCard"><div class="small">Breakdown</div><div id="reportBreakdown" class="list"></div></div>
+      </div>
+    </div>
+  </div>
+
+<div class="sheetBg" id="settingsBg">
+    <div class="sheet">
+      <div class="sheetHead"><div class="sheetTitle">Settings</div><button class="iconBtn" id="closeSettings">✕</button></div>
+      <div class="section">
+        <h4>Fortnight</h4>
+        <div class="field"><label>Fortnight start date</label><input class="input" type="date" id="fortnightStart"></div>
+        <div class="field"><label>Hour alert limit</label><input class="input" type="number" step="0.1" min="1" id="hourLimit"></div>
+        <div class="small">Set this once. Work hours are grouped into 14-day blocks from this date.</div>
+        <div class="field"><label>Monthly expense warning threshold</label><input class="input" type="number" step="0.01" min="0" id="expenseThreshold"></div>
+        <div class="small">If this month's spending goes over the threshold, the front expense card turns red.</div>
+        <div class="field"><label>Monthly income target threshold</label><input class="input" type="number" step="0.01" min="0" id="incomeThreshold"></div>
+        <div class="small">If this month's income is above the threshold, the income card turns green. If below, it turns red.</div>
+        <div class="field"><label>Single purchase skull threshold</label><input class="input" type="number" step="0.01" min="0" id="singleExpenseThreshold"></div>
+        <div class="small">If a single expense goes above this threshold, a skull icon appears beside that entry.</div>
+      </div>
+      <div class="section">
+        <h4>Backup</h4>
+        <div class="sheetBtns">
+          <button class="sheetBtn" id="exportJsonBtn" type="button">Show export JSON</button>
+          <button class="sheetBtn alt" id="copyBackupBtn">Copy export JSON</button>
+          <button class="sheetBtn alt" id="chooseImportBtn">Choose file</button>
+          <button class="sheetBtn alt" id="importBtn">Import file</button>
+          <button class="sheetBtn alt" id="importTextBtn">Import from text</button>
+        </div>
+        <textarea id="backupText" class="backupBox" spellcheck="false" placeholder="Export JSON appears here. You can also paste JSON or plain text here, then use Import from text."></textarea>
+        <input type="file" id="importFile" accept=".json,.txt,.csv,.xls,.xlsx,application/json,text/plain,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="hidden" />
+        <div class="small" id="importFileName">No file selected.</div>
+        <div class="small">Use Show export JSON to reveal a backup you can copy. You can also paste JSON or your old text list and import from the box.</div>
+      </div>
+      <div class="section">
+        <h4>Categories</h4>
+        <div class="field"><label>Add category</label><div class="quickWrap"><input class="quickInput" id="newCategoryName" placeholder="e.g. Charity"><button class="enterBtn" type="button" id="addCategoryBtn">Add</button></div></div>
+        <div class="small">Rename any category below. This also updates existing expense entries in that category.</div>
+        <div class="catList" id="categoryListBox"></div>
+        <div class="toolGrid">
+          <div class="toolRow">
+            <label>Merge category into another</label>
+            <div class="quickWrap">
+              <select id="mergeFromCategory" class="quickInput"></select>
+              <select id="mergeToCategory" class="quickInput"></select>
+              <button class="enterBtn" type="button" id="mergeCategoryBtn">Merge</button>
+            </div>
+          </div>
+          <div class="toolRow">
+            <label>See items inside a category</label>
+            <div class="quickWrap">
+              <select id="categoryItemsSelect" class="quickInput"></select>
+            </div>
+            <div class="categoryItemsBox" id="categoryItemsBox"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheetBg" id="editBg">
+    <div class="sheet">
+      <div class="sheetHead"><div class="sheetTitle">Edit entry</div><button class="iconBtn" id="closeEdit">✕</button></div>
+      <div id="editForm"></div>
+    </div>
+  </div>
+
+  <script>
+    const KEY='hishebi_simple_v32';
+    const state=loadState();
+    let activeTab='expense';
+    let fortnightOffset=0;
+    let editing=null;
+    let expenseMonthOffset=0;
+    let incomeMonthOffset=0;
+    let searchQuery='';
+
+    const el={
+      spentCard:gid('spentCard'), incomeCard:gid('incomeCard'), netCard:gid('netCard'),
+      quickEntry:gid('quickEntry'), smartHint:gid('smartHint'), expenseList:gid('expenseList'), incomeList:gid('incomeList'), workList:gid('workList'),
+      settingsBg:gid('settingsBg'), toggleThemeBtn:gid('toggleThemeBtn'), fortnightStart:gid('fortnightStart'), hourLimit:gid('hourLimit'), importFileName:gid('importFileName'),
+      fortnightLabel:gid('fortnightLabel'), hoursTotalLabel:gid('hoursTotalLabel'), workAlert:gid('workAlert'),
+      editBg:gid('editBg'), editForm:gid('editForm'),
+      expenseCategorySummary:gid('expenseSummaryBox'), expenseMonthLabel:gid('expenseMonthLabel'), incomeMonthLabel:gid('incomeMonthLabel'), expenseThreshold:gid('expenseThreshold'), incomeThreshold:gid('incomeThreshold'), singleExpenseThreshold:gid('singleExpenseThreshold'), searchBg:gid('searchBg'), searchInput:gid('searchInput'), searchInputInline:gid('searchInputInline'), searchScopeInline:gid('searchScopeInline'), reportBg:gid('reportBg'), reportMode:gid('reportMode'), reportMonth:gid('reportMonth'), reportYear:gid('reportYear'), reportCategory:gid('reportCategory'), reportTotal:gid('reportTotal'), reportCount:gid('reportCount'), reportBreakdown:gid('reportBreakdown'), categoryListBox:gid('categoryListBox'), newCategoryName:gid('newCategoryName'), backupText:gid('backupText'), mergeFromCategory:gid('mergeFromCategory'), mergeToCategory:gid('mergeToCategory'), mergeCategoryBtn:gid('mergeCategoryBtn'), categoryItemsSelect:gid('categoryItemsSelect'), categoryItemsBox:gid('categoryItemsBox'), exportMenu:gid('exportMenu'), copyBackupBtn:gid('copyBackupBtn'), importTextBtn:gid('importTextBtn')
+    };
+
+    init();
+
+    function init(){
+      applyTheme();
+      el.fortnightStart.value=state.fortnightStart;
+      el.hourLimit.value=String(state.hourLimit);
+      el.expenseThreshold.value=String(state.expenseThreshold ?? 1000);
+      el.incomeThreshold.value=String(state.incomeThreshold ?? 0);
+      el.singleExpenseThreshold.value=String(state.singleExpenseThreshold ?? 100);
+      if(el.reportMonth) el.reportMonth.value=todayISO().slice(0,7);
+      wire();
+      refreshBackupText();
+      render();
+    }
+
+    function gid(id){return document.getElementById(id)}
+    function wire(){
+      gid('addSmartBtn').addEventListener('click', addSmart);
+      el.quickEntry.addEventListener('input', renderSmartHint);
+      el.quickEntry.addEventListener('keydown', e=>{if(e.key==='Enter') addSmart();});
+      document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>setTab(btn.dataset.tab)));
+      (gid('settingsBtn')||gid('openSettings'))?.addEventListener('click',()=>el.settingsBg.classList.add('show'));
+      gid('closeSettings')?.addEventListener('click',()=>el.settingsBg.classList.remove('show'));
+      el.settingsBg?.addEventListener('click',e=>{if(e.target===el.settingsBg) el.settingsBg.classList.remove('show');});
+      gid('closeEdit')?.addEventListener('click',closeEdit);
+      gid('reportBtn')?.addEventListener('click',()=>{populateYearOptions(); populateReportControls(); el.reportBg.classList.add('show'); renderReport();});
+      gid('closeReport')?.addEventListener('click',()=>el.reportBg.classList.remove('show'));
+      el.reportBg?.addEventListener('click',e=>{if(e.target===el.reportBg) el.reportBg.classList.remove('show');});
+      el.editBg?.addEventListener('click',e=>{if(e.target===el.editBg) closeEdit();});
+      (gid('themeToggleBtn')||gid('toggleThemeBtn'))?.addEventListener('click',()=>{ state.theme=state.theme==='light'?'dark':'light'; applyTheme(); afterChange(false); });
+      el.fortnightStart.addEventListener('change',()=>{ if(validISO(el.fortnightStart.value)){state.fortnightStart=el.fortnightStart.value; fortnightOffset=0; afterChange(false);} });
+      el.hourLimit.addEventListener('change',()=>{ const n=Number(el.hourLimit.value); state.hourLimit=n>0?n:48; el.hourLimit.value=String(state.hourLimit); afterChange(false); });
+      el.expenseThreshold.addEventListener('change',()=>{ const n=Number(el.expenseThreshold.value); state.expenseThreshold=n>=0?n:1000; el.expenseThreshold.value=String(state.expenseThreshold); afterChange(false); });
+      el.incomeThreshold.addEventListener('change',()=>{ const n=Number(el.incomeThreshold.value); state.incomeThreshold=n>=0?n:0; el.incomeThreshold.value=String(state.incomeThreshold); afterChange(false); });
+      el.singleExpenseThreshold.addEventListener('change',()=>{ const n=Number(el.singleExpenseThreshold.value); state.singleExpenseThreshold=n>=0?n:100; el.singleExpenseThreshold.value=String(state.singleExpenseThreshold); afterChange(false); });
+      const wireCollapse=(btnId, boxId)=>{ const btn=gid(btnId), box=gid(boxId); const sync=()=>btn.textContent=box.classList.contains('open')?'▴':'▾'; sync(); btn.addEventListener('click',()=>{ box.classList.toggle('open'); sync(); }); };
+      wireCollapse('toggleExpenseSummary','expenseSummaryBox');
+      wireCollapse('toggleExpenseItems','expenseItemsBox');
+      wireCollapse('toggleIncomeItems','incomeItemsBox');
+      gid('prevExpenseMonth').addEventListener('click',()=>{expenseMonthOffset--; render();});
+      gid('nextExpenseMonth').addEventListener('click',()=>{expenseMonthOffset++; render();});
+      gid('expenseMonthLabel').addEventListener('click',()=>{expenseMonthOffset=0; render();});
+      gid('prevIncomeMonth').addEventListener('click',()=>{incomeMonthOffset--; render();});
+      gid('nextIncomeMonth').addEventListener('click',()=>{incomeMonthOffset++; render();});
+      gid('incomeMonthLabel').addEventListener('click',()=>{incomeMonthOffset=0; render();});
+      gid('copyBackupBtn')?.addEventListener('click', copyBackup);
+      gid('addCategoryBtn').addEventListener('click', addCategoryFromInput);
+      gid('mergeCategoryBtn')?.addEventListener('click', mergeCategoriesFromControls);
+      gid('exportMenuBtn')?.addEventListener('click', toggleExportMenu);
+      gid('exportJsonBtn')?.addEventListener('click', exportBackup);
+      el.newCategoryName?.addEventListener('keydown',e=>{if(e.key==='Enter') addCategoryFromInput();});
+      gid('chooseImportBtn').addEventListener('click',()=>gid('importFile').click());
+      gid('importFile').addEventListener('change',()=>{const f=gid('importFile').files[0]; el.importFileName.textContent=f?f.name:'No file selected.';});
+      gid('importBtn').addEventListener('click', importBackup);
+      gid('importTextBtn')?.addEventListener('click', importFromTextBox);
+      gid('prevFortnight').addEventListener('click',()=>{fortnightOffset--; render();});
+      gid('nextFortnight').addEventListener('click',()=>{fortnightOffset++; render();});
+      gid('thisFortnight').addEventListener('click',()=>{fortnightOffset=0; render();});
+      gid('searchToggleBtn')?.addEventListener('click',()=>{ toggleInlineSearch(); });
+      gid('searchCloseBtn')?.addEventListener('click',closeInlineSearch);
+      el.searchInputInline?.addEventListener('input',()=>{searchQuery=(el.searchInputInline.value||'').trim().toLowerCase(); render();});
+      el.searchScopeInline?.addEventListener('change',()=>render());
+      el.reportMode?.addEventListener('change',()=>{toggleReportInputs(); renderReport();});
+      el.reportMonth?.addEventListener('change',renderReport);
+      el.reportYear?.addEventListener('change',renderReport);
+      el.reportCategory?.addEventListener('change',renderReport);
+      el.categoryItemsSelect?.addEventListener('change', renderCategoryItemsViewer);
+    }
+
+    function defaultCategoryList(){ return ['Groceries','Food','Car','Bills','Rent','Clothes','Other']; }
+    function defaultState(){return {expenses:[],income:[],work:[],theme:'dark',fortnightStart:'2026-04-13',hourLimit:48,expenseThreshold:1000,incomeThreshold:0,singleExpenseThreshold:100,customCategories:defaultCategoryList()};}
+    function loadState(){
+      try{ const raw=localStorage.getItem(KEY); if(!raw) return defaultState(); const p=JSON.parse(raw); return {
+        expenses:Array.isArray(p.expenses)?p.expenses:[], income:Array.isArray(p.income)?p.income:[], work:Array.isArray(p.work)?p.work:[],
+        theme:['dark','light'].includes(p.theme)?p.theme:'dark',
+        fortnightStart:validISO(p.fortnightStart)?p.fortnightStart:'2026-04-13',
+        hourLimit:Number(p.hourLimit)>0?Number(p.hourLimit):48,
+        expenseThreshold:Number(p.expenseThreshold)>=0?Number(p.expenseThreshold):1000,
+        incomeThreshold:Number(p.incomeThreshold)>=0?Number(p.incomeThreshold):0,
+        singleExpenseThreshold:Number(p.singleExpenseThreshold)>=0?Number(p.singleExpenseThreshold):100,
+        customCategories:normalizeCategories(Array.isArray(p.customCategories)&&p.customCategories.length?p.customCategories:defaultCategoryList())
+      }; } catch { return defaultState(); }
+    }
+    function normalizeCategories(list){ const merged=(list||[]).map(x=>String(x||'').trim()).filter(Boolean); return [...new Set(merged)]; }
+    function saveState(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+    function afterChange(closeSettingsToo){ saveState(); refreshBackupText(); populateYearOptions(); render(); if(closeSettingsToo) el.settingsBg.classList.remove('show'); }
+
+
+    function toggleInlineSearch(force){
+      const box=gid('searchInline');
+      if(!box) return;
+      const open = (typeof force==='boolean') ? force : !box.classList.contains('open');
+      box.classList.toggle('open', open);
+      if(open){
+        setTimeout(()=>el.searchInputInline?.focus(),10);
+      }else{
+        if(el.searchInputInline) el.searchInputInline.value='';
+        searchQuery='';
+        render();
+      }
+    }
+    function closeInlineSearch(){ toggleInlineSearch(false); }
+    function addCategoryFromInput(){
+      const name=tidyCategory(el.newCategoryName?.value||'');
+      if(!name) return;
+      state.customCategories=normalizeCategories([...(state.customCategories||[]),name]);
+      if(el.newCategoryName) el.newCategoryName.value='';
+      afterChange(false);
+    }
+    function renameCategory(oldName,newName){
+      const next=tidyCategory(newName);
+      if(!next) return;
+      state.customCategories=normalizeCategories((state.customCategories||[]).map(x=>x===oldName?next:x));
+      state.expenses=state.expenses.map(x=>({...x, category:(x.category===oldName?next:x.category)}));
+      afterChange(false);
+    }
+    function deleteCategory(name){
+      state.customCategories=(state.customCategories||[]).filter(x=>x!==name);
+      afterChange(false);
+    }
+    function populateReportControls(){
+      if(el.reportCategory){
+        const cats=normalizeCategories(state.expenses.map(x=>x.category).concat(state.customCategories||[]));
+        el.reportCategory.innerHTML='<option value="__all__">All categories</option>'+cats.map(c=>`<option value="${attr(c)}">${esc(c)}</option>`).join('');
+      }
+      populateYearOptions();
+      toggleReportInputs();
+    }
+    function toggleReportInputs(){
+      const mode=el.reportMode?.value||'month';
+      gid('reportMonth').closest('.field').style.display=(mode==='month')?'block':'none';
+      gid('reportYear').closest('.field').style.display=(mode==='year')?'block':'none';
+    }
+    function reportFilteredExpenses(){
+      const mode=el.reportMode?.value||'month';
+      const cat=el.reportCategory?.value||'__all__';
+      let rows=[...state.expenses];
+      if(mode==='month'){
+        const ym=(el.reportMonth?.value || todayISO().slice(0,7));
+        rows=rows.filter(x=>x.date&&x.date.startsWith(ym));
+      }else if(mode==='year'){
+        const yy=(el.reportYear?.value || todayISO().slice(0,4));
+        rows=rows.filter(x=>x.date&&x.date.startsWith(yy+'-'));
+      }
+      if(cat!=='__all__') rows=rows.filter(x=>(x.category||'Other')===cat);
+      return rows;
+    }
+    function renderReport(){
+      if(!el.reportBg || !el.reportBg.classList.contains('show')) return;
+      const rows=reportFilteredExpenses();
+      const total=sum(rows.map(x=>x.amount));
+      el.reportTotal.textContent=money(total);
+      el.reportCount.textContent=String(rows.length);
+      const breakdown=Object.entries(rows.reduce((a,x)=>{const c=x.category||'Other'; a[c]=(a[c]||0)+Number(x.amount||0); return a;},{})).sort((a,b)=>b[1]-a[1]);
+      el.reportBreakdown.innerHTML=breakdown.length ? breakdown.map(([c,t])=>`<div class="item"><div class="itemMain"><div class="itemTitle">${esc(c)}</div></div><div class="itemValue">${esc(money(t))}</div></div>`).join('') : '<div class="empty">No matching expenses.</div>';
+    }
+
+    function applyTheme(){
+      document.body.classList.remove('light','dark');
+      document.body.classList.add(state.theme==='light' ? 'light' : 'dark');
+      const btn = gid('themeToggleBtn') || gid('toggleThemeBtn');
+      if(btn){
+        btn.textContent = state.theme==='light' ? '☀️' : '🌙';
+        btn.title = state.theme==='light' ? 'Light mode' : 'Dark mode';
+      }
+    }
+    function setTab(tab){ activeTab=tab; document.querySelectorAll('.tab').forEach(btn=>btn.classList.toggle('active', btn.dataset.tab===tab)); gid('expensePanel').classList.toggle('hidden', tab!=='expense'); gid('incomePanel').classList.toggle('hidden', tab!=='income'); gid('workPanel').classList.toggle('hidden', tab!=='work'); renderSmartHint(); }
+
+    function parseSmartInput(raw){
+      const text=(raw||'').trim();
+      if(!text) return null;
+      const tokens=text.split(/\s+/);
+      const first=(tokens[0]||'').toLowerCase();
+      const incomeWords=['income','salary','pay','earned','wage'];
+      const workWords=['work','worked','hours','shift'];
+
+      if(incomeWords.includes(first)){
+        const rest=tokens.slice(1);
+        const idx=rest.findIndex(t=>/^[-+]?\d+(?:\.\d+)?$/.test(t));
+        if(idx<0) return {type:'income', error:'Type income like income 100 uber'};
+        const amount=Number(rest[idx]);
+        const label=[...rest.slice(0,idx),...rest.slice(idx+1)].join(' ').trim() || 'Income';
+        return {type:'income', amount, label};
+      }
+
+      if(workWords.includes(first)){
+        const rest=tokens.slice(1);
+        const idx=rest.findIndex(t=>/^[-+]?\d+(?:\.\d+)?$/.test(t));
+        if(idx<0) return {type:'work', error:'Type work like work 7.5 uber'};
+        const hours=Number(rest[idx]);
+        const place=[...rest.slice(0,idx),...rest.slice(idx+1)].join(' ').trim();
+        return {type:'work', hours, place};
+      }
+
+      const match=text.match(/(.+?)\s+([-+]?\d+(?:\.\d+)?)$/);
+      if(!match) return {type:'expense', error:'Type expense like pizza 40'};
+      const before=match[1].trim();
+      const amount=Number(match[2]);
+      if(!before) return {type:'expense', error:'Type expense like pizza 40'};
+      const parts=before.split(/\s+/);
+      if(parts.length>=2){
+        const category=tidyCategory(parts[0]);
+        const item=parts.slice(1).join(' ').trim();
+        return {type:'expense', item:item || category, amount, category, explicitCategory:true};
+      }
+      const item=before;
+      return {type:'expense', item, amount, category:categoryFor(item), explicitCategory:false};
+    }
+
+    function addSmart(){
+      const parsed=parseSmartInput(el.quickEntry.value);
+      if(!parsed || parsed.error){ renderSmartHint(parsed?.error); return; }
+      if(parsed.type==='expense'){
+        let chosenCat = parsed.category || 'Other';
+        if(parsed.explicitCategory && chosenCat){
+          state.customCategories=normalizeCategories([...(state.customCategories||[]), chosenCat]);
+        }
+        state.expenses.unshift({id:uid(), item:parsed.item, amount:parsed.amount, date:todayISO(), category:chosenCat});
+      } else if(parsed.type==='income'){
+        state.income.unshift({id:uid(), item:parsed.label, amount:parsed.amount, date:todayISO()});
+      } else if(parsed.type==='work'){
+        state.work.unshift({id:uid(), place:parsed.place, hours:parsed.hours, date:todayISO()});
+      }
+      el.quickEntry.value='';
+      renderSmartHint();
+      afterChange(false);
+    }
+
+    function categoryFor(item){
+      const t=String(item||'').toLowerCase();
+      if (/(beef|chicken|meat|lamb|groc|grocer|rice|onion|dal|veg|vegetable|fruit|milk|egg|oil|fish|salt|spice)/.test(t)) return 'Groceries';
+      if (/(pizza|burger|mcd|kfc|junk|cake|coke|juice|drink|biriyani|nehari|roti|food|ramen|haleem|tehari|biryani|cookies?)/.test(t)) return 'Food';
+      if (/(fuel|rego|car|uber|bus|metro|parking|tyre|service|buscard|metropass)/.test(t)) return 'Car';
+      if (/(chatgpt|gpt|icloud|netflix|spotify|phone|bill|internet|gas|electricity|intbill|phoneplan|belong)/.test(t)) return 'Bills';
+      if (/(rent|bond)/.test(t)) return 'Rent';
+      if (/(shirt|jeans|shoes|pant|tshirt|clothes|jacket)/.test(t)) return 'Clothes';
+      return 'Other';
+    }
+
+    function renderSmartHint(msg){
+      if(msg){ el.smartHint.textContent=msg; return; }
+      const parsed=parseSmartInput(el.quickEntry.value);
+      if(!parsed){ el.smartHint.innerHTML='Expense: <b>pizza 40</b> • Income: <b>income 100 uber</b> • Work: <b>work 7.5 uber</b> • Own category: <b>charity car 40</b>'; return; }
+      if(parsed.error){ el.smartHint.textContent=parsed.error; return; }
+      if(parsed.type==='expense') el.smartHint.textContent=`Expense • ${parsed.item} • ${money(parsed.amount)} • Category: ${parsed.category || 'Other'}`;
+      if(parsed.type==='income') el.smartHint.textContent=`Income • ${parsed.label} • ${money(parsed.amount)}`;
+      if(parsed.type==='work') el.smartHint.textContent=`Work • ${parsed.place || 'No place'} • ${parsed.hours.toFixed(1)} hrs`;
+    }
+
+
+    function filteredRowsForSearch(type, context){
+      let rows=type==='expenses' ? [...state.expenses] : type==='income' ? [...state.income] : [...state.work];
+      const scope=el.searchScopeInline?.value || 'shown_month';
+      if(type==='expenses'){
+        const ym = (scope==='current_month') ? todayISO().slice(0,7)
+                 : (scope==='shown_year') ? String(context).slice(0,4)
+                 : (scope==='all') ? null
+                 : context;
+        if(scope==='shown_year') rows=rows.filter(x=>x.date && x.date.startsWith(ym+'-'));
+        else if(ym) rows=rows.filter(x=>x.date && x.date.startsWith(ym));
+      }else if(type==='income'){
+        const ym = (scope==='current_month') ? todayISO().slice(0,7)
+                 : (scope==='shown_year') ? String(context).slice(0,4)
+                 : (scope==='all') ? null
+                 : context;
+        if(scope==='shown_year') rows=rows.filter(x=>x.date && x.date.startsWith(ym+'-'));
+        else if(ym) rows=rows.filter(x=>x.date && x.date.startsWith(ym));
+      }else{
+        if(scope==='all'){
+          // keep all work rows
+        }else if(scope==='shown_year'){
+          const yy=(context.start||todayISO()).slice(0,4);
+          rows=rows.filter(x=>x.date && x.date.startsWith(yy+'-'));
+        }else{
+          const base = scope==='current_month' ? todayISO() : (context.start||todayISO());
+          const range=fortnightRangeFor(base, state.fortnightStart);
+          rows=rows.filter(x=>x.date>=range.start && x.date<=range.end);
+        }
+      }
+      rows=rows.sort(byDateDesc);
+      return applySearch(rows, type);
+    }
+
+    function render(){
+      const expenseYM=monthShift(todayISO().slice(0,7), expenseMonthOffset);
+      const incomeYM=monthShift(todayISO().slice(0,7), incomeMonthOffset);
+      const cardYM=todayISO().slice(0,7);
+      const monthExpenses=state.expenses.filter(x=>x.date && x.date.startsWith(cardYM));
+      const monthIncomeCard=state.income.filter(x=>x.date && x.date.startsWith(cardYM));
+      const currentRange=fortnightRangeFor(shiftDate(todayISO(), fortnightOffset*14), state.fortnightStart);
+      const fortnightWork=state.work.filter(x=>x.date>=currentRange.start && x.date<=currentRange.end);
+      const spent=sum(monthExpenses.map(x=>x.amount)); const incomeCard=sum(monthIncomeCard.map(x=>x.amount)); const hours=sum(fortnightWork.map(x=>x.hours));
+      const expenseRows=filteredRowsForSearch('expenses', expenseYM).slice(0,100);
+      const incomeRows=filteredRowsForSearch('income', incomeYM).slice(0,100);
+      const workRows=filteredRowsForSearch('work', currentRange).slice(0,100);
+      const catSummary=categorySummaryFor(expenseYM);
+      el.spentCard.textContent=money(spent); el.incomeCard.textContent=money(incomeCard); el.netCard.textContent=money(incomeCard-spent);
+      el.spentCard.classList.toggle('spentOver', spent>Number(state.expenseThreshold||1000));
+      el.spentCard.classList.toggle('spentSafe', spent<=Number(state.expenseThreshold||1000));
+      el.incomeCard.classList.toggle('incomeGood', incomeCard>=Number(state.incomeThreshold||0));
+      el.incomeCard.classList.toggle('incomeLow', incomeCard<Number(state.incomeThreshold||0));
+      el.netCard.classList.toggle('netPositive', (incomeCard-spent)>=0);
+      el.netCard.classList.toggle('netNegative', (incomeCard-spent)<0);
+      el.expenseMonthLabel.textContent=monthLabelShort(expenseYM);
+      el.incomeMonthLabel.textContent=monthLabelShort(incomeYM);
+      gid('thisFortnight').textContent=monthLabelShort(currentRange.start.slice(0,7));
+      el.fortnightLabel.textContent=`${humanDatePlain(currentRange.start)} → ${humanDatePlain(currentRange.end)}`;
+      el.hoursTotalLabel.textContent=`${hours.toFixed(1)} hrs this fortnight`;
+      const remaining=Number(state.hourLimit)-hours;
+      el.workAlert.textContent=remaining<0 ? `Alert: you are over the ${state.hourLimit} hour fortnight limit by ${Math.abs(remaining).toFixed(1)} hours.` : `Hours used: ${hours.toFixed(1)}. Remaining before alert: ${remaining.toFixed(1)} hours.`;
+      renderCategorySummary(catSummary, expenseYM);
+      if(el.searchInputInline) el.searchInputInline.placeholder = searchQuery ? `Showing matches for "${searchQuery}"` : 'Search items, categories, amounts';
+      renderCategoryEditor();
+      populateCategoryToolSelects();
+      renderList(el.expenseList, expenseRows, 'expenses');
+      renderList(el.incomeList, incomeRows, 'income');
+      renderList(el.workList, workRows, 'work');
+      renderSmartHint();
+    }
+
+    function buildBackupObject(){
+      return {
+        version:'mito-v36',
+        exportedAt:new Date().toISOString(),
+        state:{
+          expenses:state.expenses,
+          income:state.income,
+          work:state.work,
+          theme:state.theme,
+          fortnightStart:state.fortnightStart,
+          hourLimit:state.hourLimit,
+          expenseThreshold:state.expenseThreshold,
+          incomeThreshold:state.incomeThreshold,
+          singleExpenseThreshold:state.singleExpenseThreshold,
+          customCategories:state.customCategories
+        }
+      };
+    }
+
+    function refreshBackupText(){
+      if(el.backupText) el.backupText.value = JSON.stringify(buildBackupObject(), null, 2);
+    }
+
+    function downloadBlob(filename, blob){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      try{
+        a.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, view:window}));
+      }catch(e){
+        a.click();
+      }
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 4000);
+      return true;
+    }
+
+    function exportBackup(){
+      const payload = JSON.stringify(buildBackupObject(), null, 2);
+      if(el.backupText){
+        el.backupText.value = payload;
+        el.backupText.focus();
+        el.backupText.select();
+      }
+    }
+
+    async function copyBackup(){
+      refreshBackupText();
+      const payload = el.backupText ? el.backupText.value : JSON.stringify(buildBackupObject(), null, 2);
+      try{
+        await navigator.clipboard.writeText(payload);
+        alert('Backup copied.');
+      }catch(e){
+        if(el.backupText){
+          el.backupText.focus();
+          el.backupText.select();
+        }
+        alert('Backup text selected. Copy it manually.');
+      }
+    }
+
+    function readFileAsText(file){
+      return new Promise((resolve, reject)=>{
+        try{
+          if(!file) return reject(new Error('No file selected.'));
+          if(typeof file.text === 'function'){
+            file.text().then(resolve).catch(()=>{
+              const reader=new FileReader();
+              reader.onload=()=>resolve(String(reader.result||''));
+              reader.onerror=()=>reject(new Error('Could not read file.'));
+              reader.readAsText(file);
+            });
+          }else{
+            const reader=new FileReader();
+            reader.onload=()=>resolve(String(reader.result||''));
+            reader.onerror=()=>reject(new Error('Could not read file.'));
+            reader.readAsText(file);
+          }
+        }catch(err){ reject(err); }
+      });
+    }
+
+    function importFromTextBox(){
+      const raw = String(el.backupText?.value || '').trim();
+      if(!raw){ alert('Paste JSON or text first.'); return; }
+      try{
+        if(raw.startsWith('{') || raw.startsWith('[')) importJsonText(raw);
+        else importTextData(raw);
+        afterChange(true);
+        alert('Imported from text.');
+      }catch(err){
+        alert('Import failed: ' + (err && err.message ? err.message : err));
+      }
+    }
+
+    async function importBackup(){
+      const input=gid('importFile');
+      const file=input && input.files ? input.files[0] : null;
+      if(!file){ alert('Choose a file first.'); return; }
+      try{
+        const name=(file.name||'').toLowerCase();
+        if(name.endsWith('.json')){
+          const raw=await readFileAsText(file);
+          importJsonText(raw);
+        }else if(name.endsWith('.txt') || name.endsWith('.csv')){
+          const raw=await readFileAsText(file);
+          importTextData(raw);
+        }else if(name.endsWith('.xlsx') || name.endsWith('.xls')){
+          await importExcelFile(file);
+        }else{
+          throw new Error('Unsupported file type. Choose JSON, text, CSV, or Excel.');
+        }
+        input.value='';
+        el.importFileName.textContent='No file selected.';
+        afterChange(true);
+        alert('Import complete.');
+      }catch(err){
+        console.error(err);
+        alert('Import failed: ' + (err && err.message ? err.message : 'Please check the file format.'));
+      }
+    }
+
+    function mergeImportedData(data){
+      if(Array.isArray(data.expenses)) state.expenses=data.expenses.map(normalizeExpense).filter(Boolean);
+      if(Array.isArray(data.income)) state.income=data.income.map(normalizeIncome).filter(Boolean);
+      if(Array.isArray(data.work)) state.work=data.work.map(normalizeWork).filter(Boolean);
+      if(validISO(data.fortnightStart)) state.fortnightStart=data.fortnightStart;
+      if(typeof data.theme==='string' && ['dark','light'].includes(data.theme)) state.theme=data.theme;
+      if(Number(data.hourLimit)>0) state.hourLimit=Number(data.hourLimit);
+      if(Number(data.expenseThreshold)>=0) state.expenseThreshold=Number(data.expenseThreshold);
+      if(Number(data.incomeThreshold)>=0) state.incomeThreshold=Number(data.incomeThreshold);
+      if(Number(data.singleExpenseThreshold)>=0) state.singleExpenseThreshold=Number(data.singleExpenseThreshold);
+      if(Array.isArray(data.customCategories)) state.customCategories=normalizeCategories(data.customCategories);
+      applyTheme();
+      if(el.fortnightStart) el.fortnightStart.value=state.fortnightStart;
+      if(el.hourLimit) el.hourLimit.value=String(state.hourLimit);
+      if(el.expenseThreshold) el.expenseThreshold.value=String(state.expenseThreshold);
+      if(el.incomeThreshold) el.incomeThreshold.value=String(state.incomeThreshold);
+      if(el.singleExpenseThreshold) el.singleExpenseThreshold.value=String(state.singleExpenseThreshold);
+    }
+
+    function importJsonText(raw){
+      const cleaned=String(raw||'').replace(/^﻿/, '').trim();
+      if(!cleaned) throw new Error('Empty JSON file.');
+      const parsed=JSON.parse(cleaned);
+      let payload = parsed && typeof parsed==='object' ? parsed : {};
+      if(payload.state && typeof payload.state==='object') payload = payload.state;
+      else if(payload.data && typeof payload.data==='object') payload = payload.data;
+      else if(payload.backup && typeof payload.backup==='object') payload = payload.backup;
+      if(Array.isArray(payload)) payload = { expenses: payload };
+
+      const mapped = {
+        expenses: Array.isArray(payload.expenses) ? payload.expenses : (Array.isArray(payload.expense) ? payload.expense : []),
+        income: Array.isArray(payload.income) ? payload.income : (Array.isArray(payload.incomes) ? payload.incomes : []),
+        work: Array.isArray(payload.work) ? payload.work : (Array.isArray(payload.workLogs) ? payload.workLogs : (Array.isArray(payload.hours) ? payload.hours : [])),
+        fortnightStart: payload.fortnightStart || (payload.settings && payload.settings.fortnightStart) || payload.fortnight_anchor || '',
+        theme: payload.theme || (payload.settings && payload.settings.theme) || '',
+        hourLimit: payload.hourLimit ?? (payload.settings && payload.settings.hourLimit) ?? payload.workHourLimit ?? '',
+        expenseThreshold: payload.expenseThreshold ?? (payload.settings && payload.settings.expenseThreshold) ?? payload.monthlyExpenseThreshold ?? '',
+        incomeThreshold: payload.incomeThreshold ?? (payload.settings && payload.settings.incomeThreshold) ?? payload.monthlyIncomeThreshold ?? '',
+        singleExpenseThreshold: payload.singleExpenseThreshold ?? (payload.settings && payload.settings.singleExpenseThreshold) ?? payload.extravagantPurchaseThreshold ?? '',
+        customCategories: Array.isArray(payload.customCategories) ? payload.customCategories : (Array.isArray(payload.categories) ? payload.categories : [])
+      };
+
+      const hasAny = mapped.expenses.length || mapped.income.length || mapped.work.length || mapped.fortnightStart || mapped.theme || mapped.customCategories.length;
+      if(!hasAny){
+        throw new Error('No compatible Mito backup data found in JSON file.');
+      }
+      mergeImportedData(mapped);
+    }
+
+    function importTextData(raw){
+      const trimmed=String(raw||'').trim();
+      if(!trimmed) return;
+      if(trimmed.startsWith('{') || trimmed.startsWith('[')){ importJsonText(trimmed); return; }
+      const lines=trimmed.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+      const expenses=[];
+      const monthMap={jan:'01',feb:'02',fev:'02',mar:'03',apr:'04',may:'05',jun:'06',june:'06',jul:'07',july:'07',aug:'08',sep:'09',sept:'09',oct:'10',nov:'11',dec:'12'};
+      let inferredYear=new Date().getFullYear();
+      const lineDate=/^([A-Za-z]+)\s+(\d{1,2})\s+(.*)$/;
+      for(const line of lines){
+        if(/^=+$/.test(line)) continue;
+        const m=line.match(lineDate);
+        if(!m) continue;
+        const mon=monthMap[m[1].toLowerCase().slice(0,4)] || monthMap[m[1].toLowerCase().slice(0,3)];
+        if(!mon) continue;
+        const day=String(Number(m[2])).padStart(2,'0');
+        let rest=m[3].trim();
+        const date=`${inferredYear}-${mon}-${day}`;
+        const tokens=rest.split(/\s+/);
+        let current=[];
+        for(const tok of tokens){
+          if(/^-?\d+(?:\.\d+)?(?:\+\d+(?:\.\d+)?)*$/.test(tok)){
+            const amount=tok.split('+').reduce((a,b)=>a+Number(b||0),0);
+            const item=current.join(' ').trim();
+            if(item) expenses.push(normalizeExpense({item, amount, date, category: categoryFor(item)}));
+            current=[];
+          }else{
+            current.push(tok.replace(/,+$/,''));
+          }
+        }
+      }
+      if(expenses.length) state.expenses=expenses;
+      else alert('No importable lines found in that text file.');
+    }
+
+    async function importExcelFile(file){
+      const XLSX=await ensureXLSX();
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'});
+      const pick=(name)=>wb.Sheets[name] ? XLSX.utils.sheet_to_json(wb.Sheets[name],{defval:''}) : [];
+      const expenses=pick('Expenses');
+      const income=pick('Income');
+      const work=pick('Work');
+      const settings=pick('Settings');
+      if(expenses.length || income.length || work.length){
+        state.expenses=expenses.map(r=>normalizeExpense({
+          id:r.id||r.ID,
+          item:r.item||r.Item||r.name||r.Name,
+          amount:r.amount||r.Amount||r.value||r.Value,
+          date:normalizeDateValue(r.date||r.Date),
+          category:r.category||r.Category
+        })).filter(Boolean);
+        state.income=income.map(r=>normalizeIncome({
+          id:r.id||r.ID,
+          item:r.item||r.Item||r.name||r.Name||'Income',
+          amount:r.amount||r.Amount||r.value||r.Value,
+          date:normalizeDateValue(r.date||r.Date)
+        })).filter(Boolean);
+        state.work=work.map(r=>normalizeWork({
+          id:r.id||r.ID,
+          hours:r.hours||r.Hours||r.amount||r.Amount,
+          place:r.place||r.Place||r.item||r.Item||'',
+          date:normalizeDateValue(r.date||r.Date)
+        })).filter(Boolean);
+        if(settings.length){
+          const row=settings[0];
+          mergeImportedData({
+            fortnightStart:normalizeDateValue(row.fortnightStart||row.FortnightStart||state.fortnightStart),
+            theme:row.theme||row.Theme||state.theme,
+            hourLimit:row.hourLimit||row.HourLimit||state.hourLimit,
+            expenseThreshold:row.expenseThreshold||row.ExpenseThreshold||state.expenseThreshold,
+            incomeThreshold:row.incomeThreshold||row.IncomeThreshold||state.incomeThreshold,
+            singleExpenseThreshold:row.singleExpenseThreshold||row.SingleExpenseThreshold||state.singleExpenseThreshold
+          });
+        }
+      }else{
+        alert('Could not find Expenses, Income, or Work sheets in that Excel file.');
+      }
+    }
+
+    function validISO(s){
+      return typeof s==='string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+    }
+
+    function normalizeDateValue(v){
+      if(!v) return '';
+      if(typeof v==='number'){
+        const base=new Date(Date.UTC(1899,11,30));
+        base.setUTCDate(base.getUTCDate()+Number(v));
+        return `${base.getUTCFullYear()}-${String(base.getUTCMonth()+1).padStart(2,'0')}-${String(base.getUTCDate()).padStart(2,'0')}`;
+      }
+      const s=String(v).trim();
+      if(validISO(s)) return s;
+      const m=s.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
+      if(m){
+        const d=String(Number(m[1])).padStart(2,'0');
+        const mo=String(Number(m[2])).padStart(2,'0');
+        let y=String(m[3]);
+        if(y.length===2) y='20'+y;
+        return `${y}-${mo}-${d}`;
+      }
+      const dt=new Date(s);
+      if(!isNaN(dt)) return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+      return '';
+    }
+
+    function normalizeExpense(x){
+      const item=String(x?.item||'').trim();
+      const amount=Number(x?.amount);
+      const date=normalizeDateValue(x?.date);
+      if(!item || !isFinite(amount) || !date) return null;
+      return {id:String(x?.id||uid()), item, amount, date, category:tidyCategory(x?.category || categoryFor(item))};
+    }
+    function normalizeIncome(x){
+      const amount=Number(x?.amount);
+      const date=normalizeDateValue(x?.date);
+      if(!isFinite(amount) || !date) return null;
+      return {id:String(x?.id||uid()), item:String(x?.item||'Income').trim()||'Income', amount, date};
+    }
+    function normalizeWork(x){
+      const hours=Number(x?.hours);
+      const date=normalizeDateValue(x?.date);
+      if(!isFinite(hours) || !date) return null;
+      return {id:String(x?.id||uid()), hours, date, place:String(x?.place||'').trim()};
+    }
+
+    function ensureXLSX(){
+      if(window.XLSX) return Promise.resolve(window.XLSX);
+      return new Promise((resolve,reject)=>{
+        const s=document.createElement('script');
+        s.src='https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js';
+        s.onload=()=>resolve(window.XLSX);
+        s.onerror=()=>reject(new Error('Could not load Excel reader'));
+        document.head.appendChild(s);
+      });
+    }
+
+
+    function monthLabel(ym){ const [y,m]=ym.split('-'); const names=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return `${names[Number(m)-1]} ${y}`; }
+    function monthLabelShort(ym){ const [y,m]=ym.split('-'); const names=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return `${names[Number(m)-1]}/${String(y).slice(2)}`; }
+    function monthShift(ym, offset){ const [y,m]=ym.split('-').map(Number); const d=new Date(y,m-1+offset,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+    function applySearch(items,type){
+      const q=(searchQuery||'').trim().toLowerCase();
+      if(!q) return items;
+      return items.filter(x=>{
+        const hay = type==='expenses'
+          ? `${x.item||''} ${x.category||''} ${x.amount||''} ${x.date||''}`
+          : type==='income'
+          ? `${x.item||''} ${x.amount||''} ${x.date||''}`
+          : `${x.place||''} ${x.date||''} ${x.hours||''}`;
+        return hay.toLowerCase().includes(q);
+      });
+    }
+
+    
+    function populateCategoryToolSelects(){
+      const cats=normalizeCategories(state.expenses.map(x=>x.category).concat(state.customCategories||[]));
+      const opts=cats.map(cat=>`<option value="${attr(cat)}">${esc(cat)}</option>`).join('');
+      if(el.mergeFromCategory) el.mergeFromCategory.innerHTML=opts;
+      if(el.mergeToCategory) el.mergeToCategory.innerHTML=opts;
+      if(el.categoryItemsSelect) el.categoryItemsSelect.innerHTML=opts;
+      if(el.mergeFromCategory && !cats.includes(el.mergeFromCategory.value)) el.mergeFromCategory.value=cats[0]||'';
+      if(el.mergeToCategory && !cats.includes(el.mergeToCategory.value)) el.mergeToCategory.value=cats[Math.min(1, Math.max(0,cats.length-1))]||cats[0]||'';
+      if(el.categoryItemsSelect && !cats.includes(el.categoryItemsSelect.value)) el.categoryItemsSelect.value=cats[0]||'';
+      renderCategoryItemsViewer();
+    }
+
+    function mergeCategoriesFromControls(){
+      const keep=tidyCategory(el.mergeFromCategory?.value||'');
+      const mergeIn=tidyCategory(el.mergeToCategory?.value||'');
+      if(!keep || !mergeIn || keep===mergeIn) return;
+      state.expenses=state.expenses.map(x=>({ ...x, category: tidyCategory(x.category||'Other')===mergeIn ? keep : x.category }));
+      const currentCats=normalizeCategories(state.expenses.map(x=>x.category).concat(state.customCategories||[]));
+      state.customCategories=normalizeCategories(currentCats.filter(c=>c!==mergeIn).concat([keep]));
+      afterChange(false);
+    }
+
+    function renderCategoryItemsViewer(){
+      if(!el.categoryItemsBox) return;
+      const cat=tidyCategory(el.categoryItemsSelect?.value || '');
+      if(!cat){ el.categoryItemsBox.innerHTML='<div class="empty">No category selected.</div>'; return; }
+      const rows=state.expenses.filter(x=>tidyCategory(x.category||'Other')===cat);
+      if(!rows.length){ el.categoryItemsBox.innerHTML='<div class="empty">No items in this category yet.</div>'; return; }
+      const grouped={};
+      rows.forEach(x=>{ const key=String(x.item||'Unknown').trim()||'Unknown'; const g=grouped[key]||(grouped[key]={count:0,total:0}); g.count++; g.total+=Number(x.amount||0); });
+      const items=Object.entries(grouped).sort((a,b)=>b[1].total-a[1].total);
+      el.categoryItemsBox.innerHTML=items.map(([name,info])=>`<div class="item"><div class="itemMain"><div class="itemTitle">${esc(name)}</div><div class="itemMeta">${info.count} entr${info.count===1?'y':'ies'}</div></div><div class="itemValue">${esc(money(info.total))}</div></div>`).join('');
+    }
+
+    function toggleExportMenu(){
+      el.exportMenu?.classList.toggle('show');
+    }
+    function closeExportMenu(){}
+
+    function exportCombinedCSV(){
+      const rows=[['type','id','item_or_place','category','amount_or_hours','date']];
+      state.expenses.forEach(x=>rows.push(['expense',x.id||'',x.item||'',x.category||'',Number(x.amount||0),x.date||'']));
+      state.income.forEach(x=>rows.push(['income',x.id||'',x.item||'', '', Number(x.amount||0),x.date||'']));
+      state.work.forEach(x=>rows.push(['work',x.id||'',x.place||'', '', Number(x.hours||0),x.date||'']));
+      const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+      if(el.backupText) el.backupText.value=csv;
+      downloadBlob('mito-export.csv', new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+    }
+
+function renderCategoryEditor(){
+      if(!el.categoryListBox) return;
+      const cats=normalizeCategories(state.expenses.map(x=>x.category).concat(state.customCategories||[]));
+      el.categoryListBox.innerHTML=cats.map(cat=>`<div class="catRow"><input value="${attr(cat)}" data-cat-old="${attr(cat)}"><button class="miniBtn" data-cat-save="${attr(cat)}">Save</button><button class="miniBtn danger" data-cat-del="${attr(cat)}">Delete</button></div>`).join('') || '<div class="empty">No categories yet.</div>';
+      el.categoryListBox.querySelectorAll('[data-cat-save]').forEach(btn=>btn.addEventListener('click',()=>{const inp=el.categoryListBox.querySelector(`input[data-cat-old="${CSS.escape(btn.dataset.catSave)}"]`); renameCategory(btn.dataset.catSave, inp?.value||btn.dataset.catSave);}));
+      el.categoryListBox.querySelectorAll('[data-cat-del]').forEach(btn=>btn.addEventListener('click',()=>deleteCategory(btn.dataset.catDel)));
+      renderCategoryItemsViewer();
+    }
+
+    function renderCategorySummary(items, ym){
+      if(!items.length){ el.expenseCategorySummary.innerHTML=`<div class="empty">No expenses in ${esc(monthLabel(ym))}.</div>`; return; }
+      el.expenseCategorySummary.innerHTML=items.map(([cat,total])=>`<div class="item"><div class="itemMain"><div class="itemTitle">${esc(cat)}</div><div class="itemMeta">${esc(monthLabel(ym))}</div></div><div class="itemValue">${esc(money(total))}</div></div>`).join('');
+    }
+    function renderList(container, items, type){
+      if(!items.length){ container.innerHTML='<div class="empty">Nothing here yet.</div>'; return; }
+      container.innerHTML=items.map(item=>rowHtml(item,type)).join('');
+      container.querySelectorAll('[data-del]').forEach(btn=>btn.addEventListener('click',()=>deleteEntry(btn.dataset.type, btn.dataset.id)));
+      container.querySelectorAll('[data-edit]').forEach(btn=>btn.addEventListener('click',()=>openEdit(btn.dataset.type, btn.dataset.id)));
+    }
+
+    function rowHtml(item,type){
+      if(type==='expenses') return `<div class="item"><div class="itemMain"><div class="itemTitle">${esc(item.item)}</div><div class="itemMeta"><span class="catBadge">${esc(item.category || 'Other')}</span>${esc(humanDate(item.date))}</div></div><div class="rowBtns"><div class="itemValueWrap">${Number(item.amount||0)>Number(state.singleExpenseThreshold||100) ? '<span class="skullBadge" title="Extravagant purchase">☠</span>' : ''}<span class="itemValue">${esc(money(item.amount))}</span></div><button class="rowBtn" data-edit data-type="expenses" data-id="${attr(item.id)}">Edit</button><button class="rowBtn danger" data-del data-type="expenses" data-id="${attr(item.id)}">Delete</button></div></div>`;
+      if(type==='income') return `<div class="item"><div class="itemMain"><div class="itemTitle">${esc(item.item||'Income')}</div><div class="itemMeta">${esc(humanDate(item.date))}</div></div><div class="rowBtns"><div class="itemValue">${esc(money(item.amount))}</div><button class="rowBtn" data-edit data-type="income" data-id="${attr(item.id)}">Edit</button><button class="rowBtn danger" data-del data-type="income" data-id="${attr(item.id)}">Delete</button></div></div>`;
+      return `<div class="item"><div class="itemMain"><div class="itemTitle">${esc(item.place||'Work')}</div><div class="itemMeta">${esc(humanDate(item.date))}</div></div><div class="rowBtns"><div class="itemValue">${esc(Number(item.hours||0).toFixed(2))} h</div><button class="rowBtn" data-edit data-type="work" data-id="${attr(item.id)}">Edit</button><button class="rowBtn danger" data-del data-type="work" data-id="${attr(item.id)}">Delete</button></div></div>`;
+    }
+
+    function money(n){ return '$'+Number(n||0).toFixed(2); }
+    function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
+    function byDateDesc(a,b){ return String(b.date).localeCompare(String(a.date)); }
+    function humanDate(iso){ const base=humanDatePlain(iso); const t=todayISO(); const y=shiftDate(t,-1); if(iso===t) return `Today • ${base}`; if(iso===y) return `Yesterday • ${base}`; return base; }
+    function humanDatePlain(iso){ const d=new Date(iso+'T00:00:00'); return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; }
+    function titleCase(s){ return String(s||'').trim().replace(/[_-]+/g,' ').split(/\s+/).filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' '); }
+    function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function attr(s){ return esc(String(s)).replace(/"/g,'&quot;'); }
+  
+    function uid(){ return 'id_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+    function todayISO(){
+      const d=new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function shiftDate(iso, days){
+      const d=new Date(iso+'T00:00:00');
+      d.setDate(d.getDate()+Number(days||0));
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function diffDays(a,b){
+      const da=new Date(a+'T00:00:00');
+      const db=new Date(b+'T00:00:00');
+      return Math.floor((da-db)/86400000);
+    }
+    function fortnightRangeFor(targetISO, anchorISO){
+      const anchor = validISO(anchorISO) ? anchorISO : todayISO();
+      const target = validISO(targetISO) ? targetISO : todayISO();
+      const diff = diffDays(target, anchor);
+      const period = Math.floor(diff/14);
+      const start = shiftDate(anchor, period*14);
+      const end = shiftDate(start, 13);
+      return {start, end};
+    }
+    function deleteEntry(type, id){
+      if(type==='expenses') state.expenses = state.expenses.filter(x=>String(x.id)!==String(id));
+      else if(type==='income') state.income = state.income.filter(x=>String(x.id)!==String(id));
+      else if(type==='work') state.work = state.work.filter(x=>String(x.id)!==String(id));
+      afterChange(false);
+    }
+    function closeEdit(){
+      editing=null;
+      el.editForm.innerHTML='';
+      el.editBg.classList.remove('show');
+    }
+    function openEdit(type, id){
+      editing = {type, id};
+      let row=null;
+      if(type==='expenses') row=state.expenses.find(x=>String(x.id)===String(id));
+      else if(type==='income') row=state.income.find(x=>String(x.id)===String(id));
+      else if(type==='work') row=state.work.find(x=>String(x.id)===String(id));
+      if(!row) return;
+      if(type==='expenses'){
+        el.editForm.innerHTML = `
+          <div class="stack">
+            <label class="fieldLabel">Item</label>
+            <input id="editItem" class="fieldInput" value="${attr(row.item||'')}">
+            <label class="fieldLabel">Amount</label>
+            <input id="editAmount" class="fieldInput" type="number" step="0.01" value="${attr(row.amount)}">
+            <label class="fieldLabel">Date</label>
+            <input id="editDate" class="fieldInput" type="date" value="${attr(row.date||todayISO())}">
+            <label class="fieldLabel">Category</label>
+            <input id="editCategory" class="fieldInput" value="${attr(row.category||'Other')}">
+            <button id="saveEditBtn" class="enterBtn" style="margin-top:12px;width:100%">Save</button>
+          </div>`;
+      } else if(type==='income'){
+        el.editForm.innerHTML = `
+          <div class="stack">
+            <label class="fieldLabel">Label</label>
+            <input id="editItem" class="fieldInput" value="${attr(row.item||'Income')}">
+            <label class="fieldLabel">Amount</label>
+            <input id="editAmount" class="fieldInput" type="number" step="0.01" value="${attr(row.amount)}">
+            <label class="fieldLabel">Date</label>
+            <input id="editDate" class="fieldInput" type="date" value="${attr(row.date||todayISO())}">
+            <button id="saveEditBtn" class="enterBtn" style="margin-top:12px;width:100%">Save</button>
+          </div>`;
+      } else {
+        el.editForm.innerHTML = `
+          <div class="stack">
+            <label class="fieldLabel">Place</label>
+            <input id="editPlace" class="fieldInput" value="${attr(row.place||'')}">
+            <label class="fieldLabel">Hours</label>
+            <input id="editHours" class="fieldInput" type="number" step="0.01" value="${attr(row.hours)}">
+            <label class="fieldLabel">Date</label>
+            <input id="editDate" class="fieldInput" type="date" value="${attr(row.date||todayISO())}">
+            <button id="saveEditBtn" class="enterBtn" style="margin-top:12px;width:100%">Save</button>
+          </div>`;
+      }
+      const saveBtn = gid('saveEditBtn');
+      if(saveBtn) saveBtn.addEventListener('click', ()=>{
+        if(type==='expenses'){
+          row.item = String(gid('editItem').value||'').trim() || row.item;
+          row.amount = Number(gid('editAmount').value||row.amount);
+          row.date = validISO(gid('editDate').value) ? gid('editDate').value : row.date;
+          row.category = tidyCategory(gid('editCategory').value||row.category||categoryFor(row.item));
+        } else if(type==='income'){
+          row.item = String(gid('editItem').value||'').trim() || row.item;
+          row.amount = Number(gid('editAmount').value||row.amount);
+          row.date = validISO(gid('editDate').value) ? gid('editDate').value : row.date;
+        } else {
+          row.place = String(gid('editPlace').value||'').trim();
+          row.hours = Number(gid('editHours').value||row.hours);
+          row.date = validISO(gid('editDate').value) ? gid('editDate').value : row.date;
+        }
+        closeEdit();
+        afterChange(false);
+      });
+      el.editBg.classList.add('show');
+    }
+
+
+    function tidyCategory(s){ const t=titleCase(String(s||'').trim()); return t || 'Other'; }
+    function populateYearOptions(){}
+    function categorySummaryFor(ym){
+      const totals={};
+      state.expenses.filter(x=>x.date && x.date.startsWith(ym)).forEach(x=>{
+        const cat=tidyCategory(x.category || categoryFor(x.item || ''));
+        totals[cat]=(totals[cat]||0)+Number(x.amount||0);
+      });
+      return Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+    }
+
+  
+</script>
+
+<script>
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').catch(function(err){
+      console.warn('Service worker registration failed:', err);
+    });
+  });
+}
+</script>
+
+</body>
+</html>
